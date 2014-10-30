@@ -1,6 +1,10 @@
 package com.manijshrestha.lollipopkiosk;
 
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,12 +39,35 @@ public class KioskActivity extends Activity {
                 View.SYSTEM_UI_FLAG_FULLSCREEN
               | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
               | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+        provisionOwner();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         startLockTask();
+    }
+
+    private void provisionOwner() {
+        DevicePolicyManager manager =
+                (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+        ComponentName componentName = BasicDeviceAdminReceiver.getComponentName(this);
+
+        if(!manager.isAdminActive(componentName)) {
+            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);
+            startActivityForResult(intent, 0);
+            return;
+        }
+
+        if (manager.isDeviceOwnerApp(getPackageName()))
+            manager.setLockTaskPackages(componentName, new String [] {getPackageName()});
+    }
+
+    @Override
+    public void onBackPressed() {
+        stopLockTask();
     }
 
 

@@ -3,5 +3,7 @@
 
     <string name="app_name">LollipopKiosk</string>
     <string name="action_settings">Settings</string>
+    <string name="admin_permission_label">Kiosk App</string>
+    <string name="admin_permission_description">Ability to run on Kiosk Mode</string>
 
 </resources>
